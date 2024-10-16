@@ -1,7 +1,17 @@
 const db = require('../db/database');
 
 exports.getConsultations = (req, res) => {
-  db.all(`SELECT * FROM consultations`, [], (err, rows) => {
+  const { role, id: userId } = req.user;
+
+  let query = 'SELECT * FROM consultations';
+  let params = [];
+
+  if (role === 'user') {
+    query += ' WHERE userId = ?';
+    params.push(userId);
+  }
+
+  db.all(query, params, (err, rows) => {
     if (err) {
       return res.status(500).json({ error: err.message });
     }
